@@ -1,7 +1,7 @@
 <h1 align="center">Neural Networks for Polar Codes </h1>
 
 <h1 align="center">
-  <img src="https://w7.pngwing.com/pngs/874/600/png-transparent-micron-technology-hd-logo.png" alt="Nokia Logo" width="300">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToBLl2TfiS111dcSbabRW8EwohsJDhMvQoMg&s" alt="Nokia Logo" width="300">
 </h1>
 
 
