@@ -3,8 +3,8 @@ from .utils import write_txt
 
 
 def ProjectedGradientDescent(model, x, preprocessor, iterations, best_fer):
-    print("Best FER (init):", best_fer)
-    device = model.device
+    print("Best FER (init):", float(best_fer))
+    device = model.parameters().__next__().device
 
     # Disable gradient computation for the model
     model.requires_grad = False

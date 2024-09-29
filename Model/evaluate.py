@@ -1,22 +1,26 @@
+import copy
 import math
 import time
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+plt.rcParams['figure.dpi'] = 300
+plt.rcParams['savefig.dpi'] = 300
 
 
-def stats(model, epochs, train_loader, val_loader, processor, max_time, num_runs=1):
+def stats(model_, epochs, train_loader, val_loader, processor, max_time, num_runs=1):
     mean_results, worst_results = [], []
     run = 0
     start_time = time.time()
     while True:
-        if int(time.time() - start_time) >- max_time or run == num_runs: 
+        if int(time.time() - start_time) >= max_time or run == num_runs: 
             break     
         run += 1
-        print("Run: ", run) 
+        print("Run: ", run)
+        model = copy.deepcopy(model_) 
         model.fit(train_loader, epochs)
         results = model.test(val_loader)
-        mean, worst = _IOE(*results, processor) # outputs mean and worst IOE
+        mean, worst = _IOE(results['y_true'], results['y_hat'], processor) # outputs mean and worst IOE
         mean_results.append(mean)
         worst_results.append(worst)
     print("DONE")
@@ -25,7 +29,7 @@ def stats(model, epochs, train_loader, val_loader, processor, max_time, num_runs
 
 def visualize(parameter, values, results):
     plt.figure(figsize=(8, 6), dpi=80)
-    
+    plt.title(f"Validation Loss for different {parameter}")
     # Plot the mean performance
     plt.subplot(2, 1, 1) 
     plt.plot(values, results[:, 0]) # mean IOA
@@ -42,7 +46,6 @@ def visualize(parameter, values, results):
     plt.xlabel(parameter.capitalize())
     plt.ylabel("Worst validation IOE")
 
-    plt.title(f"Validation Loss for different {parameter}")
     plt.tight_layout()
     plt.show()
 
@@ -50,7 +53,10 @@ def visualize(parameter, values, results):
 def _IOE(y_true, y_hat, processor):
     """Compute the inflation of error (IOE)"""
     y_hat = torch.cat(y_hat, dim = 0).cpu() 
-    y_hat = processor(y_hat) # to linear
+    y_true = torch.cat(y_true, dim = 0).cpu()
+
+    _, y_hat = processor.inverse_transform(y=y_hat) # to linear
+    _, y_true = processor.inverse_transform(y=y_true) # to linear
     
     mean_ratio, worst_ratio = 0, 0
     for i in range(y_hat.shape[0]):

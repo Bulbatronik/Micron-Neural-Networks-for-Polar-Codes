@@ -21,18 +21,20 @@ class Preprocessor:
         y_ = (torch.log(y) - self._y_mean_log) / self._y_std_log
         return x_, y_
 
-    def inverse_transform(self, x, y):
-        x_ = self._bit_means.repeat(x.shape[0], 1)
-        x_[:, self._indices] = x_[:, self._indices]*self._x_std + self._x_mean
-        y_ = torch.exp((y * self._y_std_log) + self._y_mean_log)
-        return x_.to(torch.int), y_
+    def inverse_transform(self, x=None, y=None):
+        if x is not None:
+            x = self._bit_means.repeat(x.shape[0], 1)
+            x[:, self._indices] = x[:, self._indices]*self._x_std + self._x_mean
+        if y is not None:
+            y = torch.exp((y * self._y_std_log) + self._y_mean_log)
+        return x, y
     
 
 class SimpleDataset(Dataset):
-    def __init__(self, all_data, all_targets):
+    def __init__(self, all_data, all_targets, device):
         super(Dataset, self).__init__()
-        self.data = all_data # features(bits)
-        self.targets = all_targets # labels (FER)
+        self.data = all_data.to(device) # features(bits)
+        self.targets = all_targets.to(device) # labels (FER)
 
     def __getitem__(self, index: int):
         img, target = self.data[index], self.targets[index]

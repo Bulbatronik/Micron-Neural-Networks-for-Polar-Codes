@@ -22,7 +22,7 @@ class MLP(nn.Module):
         activations = [x]
         for i in range(len(self.layers)):
             activations.append(self.layers[i](activations[-1]))
-            if i - 1 % self.skip_connect == 0 and i > self.skip_connect:
+            if self.skip_connect!=0 and i - 1 % self.skip_connect == 0 and i > self.skip_connect:
                 activations[-1] += activations[-1 - self.skip_connect]
         return activations[-1].reshape(-1)
     
@@ -42,7 +42,7 @@ class MLP(nn.Module):
 
                 total_loss += loss.item()
             if verbose:
-                print(f'Epoch {epoch+1}/{epochs}, Loss: {total_loss/(i+1)}')
+                print(f'Epoch {epoch+1}/{epochs}, Loss: {total_loss/(i+1):.4f}')
 
 
     @torch.no_grad()
@@ -58,5 +58,5 @@ class MLP(nn.Module):
             results['y_true'].append(y)
             results['y_hat'].append(y_pred)
         if verbose:
-            print(f'Test Loss: {total_loss/(i+1)}')
+            print(f'Test Loss: {total_loss/(i+1):.4f}')
         return results

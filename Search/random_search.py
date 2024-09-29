@@ -4,14 +4,15 @@ from .utils import write_txt
 
 
 def RandomSearch(model, x, preprocessor, max_time, best_fer):
-    print("Best FER (init):", best_fer)
+    print("Best FER (init):", float(best_fer))
+    device = model.parameters().__next__().device
     total_tested = 0
     step = 1000
     start_time = time.time()
 
     while True:
         # Create a batch of inputs, all initialized to 1
-        inp = torch.ones(step, x.shape[1]).to(model.device)
+        inp = torch.ones(step, x.shape[1]).to(device)
         
         # Randomly set half of each input's elements to -1
         for i in range(inp.shape[0]):
